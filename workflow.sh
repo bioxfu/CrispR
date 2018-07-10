@@ -21,8 +21,8 @@ ls bam/*/*|parallel --gnu 'samtools index {}'
 
 # gRNA position
 module add bowtie/1.1.2
-bowtie -f ~/Gmatic5/genome/tair10/tair10 guide/gRNA_R1-R6.fa |awk '{print $3"\t"$4"\t"$4+length($5)"\t"$1"\t0\t"$2}' > guide/gRNA_R1-R6.bed
-bowtie -f ~/Gmatic5/genome/tair10/tair10 guide/gRNA_R19-R24.fa |awk '{print $3"\t"$4"\t"$4+length($5)"\t"$1"\t0\t"$2}' > guide/gRNA_R19-R24.bed
+bowtie -f -v 0 -a ~/Gmatic5/genome/tair10/tair10 guide/gRNA_R1-R6.fa |awk '{print $3"\t"$4"\t"$4+length($5)"\t"$1"\t0\t"$2}' > guide/gRNA_R1-R6.bed
+bowtie -f -v 0 -a ~/Gmatic5/genome/tair10/tair10 guide/gRNA_R19-R24.fa |awk '{print $3"\t"$4"\t"$4+length($5)"\t"$1"\t0\t"$2}' > guide/gRNA_R19-R24.bed
 
 ## CripsRVariants
 ~/R/3.5.0/bin/Rscript script/CripsRVariants.R
