@@ -35,6 +35,9 @@ for (N in 1:length(plates)) {
       bam_fnames <- bam_fnames[c(1,5:12,2:4)]
       sample_names <- sample_names[c(1,5:12,2:4)]
       reference <- system(sprintf('samtools faidx index/tair10.fa %s:%s-%s', seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
+      if (as.character(strand(gdl[i])) == '-') {
+        reference <- Biostrings::reverseComplement(Biostrings::DNAString(reference))
+      }
       crispr_set <- readsToTarget(bam_fnames, target = gdl[i], reference = reference, names = sample_names, target.loc = 22, chimeras='ignore', verbose=FALSE)
       if (!is.null(crispr_set)) {
         pdf(paste0(folder, '/', plate, '_', gname, '_', RP, '.pdf'), wid=15, hei=15)

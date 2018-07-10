@@ -27,3 +27,10 @@ bowtie -f -v 0 -a ~/Gmatic5/genome/tair10/tair10 guide/gRNA_R19-R24.fa |awk '{pr
 ## CripsRVariants
 ~/R/3.5.0/bin/Rscript script/CripsRVariants.R
 
+##
+find bam/R1-R6_T2-1-1/*.bam -printf "%f\n"|sed 's/.bam//'|parallel --gnu "bedtools bamtobed -i bam/R1-R6_T2-1-1/{}.bam -cigar| bedtools intersect -a guide/gRNA_R1-R6.bed -b - -wa -wb |awk '{print \"R1-R6_T2-1-1\t\"\$4\"\t{}\t\"\$13}' > {}.tmp"; cat *.tmp > tables/reads_from_gRNA_with_cigar; rm *.tmp
+find bam/R1-R6_T2-1-2/*.bam -printf "%f\n"|sed 's/.bam//'|parallel --gnu "bedtools bamtobed -i bam/R1-R6_T2-1-2/{}.bam -cigar| bedtools intersect -a guide/gRNA_R1-R6.bed -b - -wa -wb |awk '{print \"R1-R6_T2-1-2\t\"\$4\"\t{}\t\"\$13}' > {}.tmp"; cat *.tmp >> tables/reads_from_gRNA_with_cigar; rm *.tmp 
+find bam/R7-12_T1-1-1/*.bam -printf "%f\n"|sed 's/.bam//'|parallel --gnu "bedtools bamtobed -i bam/R7-12_T1-1-1/{}.bam -cigar| bedtools intersect -a guide/gRNA_R19-R24.bed -b - -wa -wb |awk '{print \"R7-12_T1-1-1\t\"\$4\"\t{}\t\"\$13}' > {}.tmp"; cat *.tmp >> tables/reads_from_gRNA_with_cigar; rm *.tmp
+find bam/R7-12_T1-1-2/*.bam -printf "%f\n"|sed 's/.bam//'|parallel --gnu "bedtools bamtobed -i bam/R7-12_T1-1-2/{}.bam -cigar| bedtools intersect -a guide/gRNA_R19-R24.bed -b - -wa -wb |awk '{print \"R7-12_T1-1-2\t\"\$4\"\t{}\t\"\$13}' > {}.tmp"; cat *.tmp >> tables/reads_from_gRNA_with_cigar; rm *.tmp
+
+Rscript script/indel_from_cigar.R
