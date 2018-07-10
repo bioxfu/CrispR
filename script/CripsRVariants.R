@@ -36,7 +36,7 @@ for (N in 1:length(plates)) {
       sample_names <- sample_names[c(1,5:12,2:4)]
       reference <- system(sprintf('samtools faidx index/tair10.fa %s:%s-%s', seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
       crispr_set <- readsToTarget(bam_fnames, target = gdl[i], reference = reference, names = sample_names, target.loc = 22, chimeras='ignore', verbose=FALSE)
-      if (!is.null(crispr_set) && sum(grepl('no variant', rownames(crispr_set$cigar_freqs))) == 1) {
+      if (!is.null(crispr_set)) {
         pdf(paste0(folder, '/', plate, '_', gname, '_', RP, '.pdf'), wid=15, hei=15)
         p <- plotVariants(crispr_set, txdb=txdb, gene.text.size=8,
                           row.ht.ratio=c(1,8), col.wdth.ratio=c(4,2),
@@ -47,7 +47,17 @@ for (N in 1:length(plates)) {
 
         freqs <- crispr_set$cigar_freqs
         freqs_all <- colSums(freqs)
-        freqs_indel <- colSums(freqs[-c(1, grep('SNV', rownames(freqs))),])
+        indel <- grep('[DI]', rownames(freqs))
+        if (length(indel) == 0) {
+          freqs_indel <- rep(0, ncol(freqs))
+        }
+        if (length(indel) == 1) {
+          freqs_indel <- freqs[indel,]
+        }
+        if (length(indel) > 1) {
+          freqs_indel <- colSums(freqs[indel,])
+        }
+        
         indel_percent <- round(freqs_indel / freqs_all * 100, 2)
         sample_names <- names(freqs_all)
         indel_table <- rbind(indel_table, as.data.frame(cbind(plate, gname, sample_names, freqs_all, freqs_indel, indel_percent)))
