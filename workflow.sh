@@ -1,3 +1,11 @@
+## init
+source activate gmatic
+mkdir tables
+mkdir raw
+mkdir guide
+mkdir index
+mkdir guide
+
 ## Spliting
 Rscript script/parse_barcode_in_excel.R
 # 

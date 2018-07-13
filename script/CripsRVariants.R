@@ -65,6 +65,9 @@ for (N in 1:length(plates)) {
         sample_names <- names(freqs_all)
         indel_table <- rbind(indel_table, as.data.frame(cbind(plate, gname, sample_names, freqs_all, freqs_indel, indel_percent)))
       }
+      else {
+        indel_table <- rbind(indel_table, as.data.frame(cbind(plate, gname, sample_names, freqs_all=0, freqs_indel=0, indel_percent=0)))
+      }
     }
   }
 }
