@@ -2,17 +2,13 @@ library(CrispRVariants)
 library(rtracklayer)
 library(GenomicFeatures)
 library(gridExtra)
-txdb <- loadDb('./txdb/tair10_txdb.sqlite')
 
-plates <- c('R1-R6_T2-1-1', 
-           'R1-R6_T2-1-2',
-           'R7-12_T1-1-1', 
-           'R7-12_T1-1-2')
+argv <- commandArgs(T)
+txdb <- loadDb(argv[1])
+
+plates <- c('plate01')
            
-gd_fnames <- c('guide/gRNA_R1-R6.bed',
-              'guide/gRNA_R1-R6.bed',
-              'guide/gRNA_R19-R24.bed',
-              'guide/gRNA_R19-R24.bed')
+gd_fnames <- c('guide/gRNA.bed')
 
 indel_table <- NULL
 
@@ -34,7 +30,7 @@ for (N in 1:length(plates)) {
       sample_names <- sub('.bam', '', dir(paste0('bam/', plate), pattern = paste0(RP, '_[0-9]+.bam$')))
       bam_fnames <- bam_fnames[c(1,5:12,2:4)]
       sample_names <- sample_names[c(1,5:12,2:4)]
-      reference <- system(sprintf('samtools faidx index/tair10.fa %s:%s-%s', seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
+      reference <- system(sprintf('samtools faidx ~/Gmatic7/genome/tair10/tair10.fa %s:%s-%s', seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
       if (as.character(strand(gdl[i])) == '-') {
         reference <- Biostrings::reverseComplement(Biostrings::DNAString(reference))
       }

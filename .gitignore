@@ -1,12 +1,5 @@
 .Rhistory
-raw/
-split/
-archive
+split
 bam
 figures
-guide
-index
-stat
-tables
-txdb
 
