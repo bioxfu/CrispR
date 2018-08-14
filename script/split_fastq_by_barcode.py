@@ -1,10 +1,6 @@
 #! /usr/bin/env python
 
 from optparse import OptionParser
-try:
-    from itertools import izip as zip
-except ImportError: # will be 3.x series
-    pass
 import gzip
 import os
 
@@ -40,13 +36,13 @@ for samples in barcode2sample.values():
 
 for lineA, lineB in zip(fileA, fileB):
 	lineA_1 = lineA.strip()
-	lineA_2 = fileA.next().strip()
-	lineA_3 = fileA.next().strip()
-	lineA_4 = fileA.next().strip()
+	lineA_2 = next(fileA).strip()
+	lineA_3 = next(fileA).strip()
+	lineA_4 = next(fileA).strip()
 	lineB_1 = lineB.strip()
-	lineB_2 = fileB.next().strip()
-	lineB_3 = fileB.next().strip()
-	lineB_4 = fileB.next().strip()
+	lineB_2 = next(fileB).strip()
+	lineB_3 = next(fileB).strip()
+	lineB_4 = next(fileB).strip()
 
 	FP = lineA_2[4:8]
 	RP = lineB_2[4:8]
