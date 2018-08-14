@@ -1,6 +1,4 @@
-#! ~/miniconda2/bin/python
-
-## Note: This script only works in Python2
+## Note: This script is only compatible with Python2
 
 from optparse import OptionParser
 from itertools import izip
