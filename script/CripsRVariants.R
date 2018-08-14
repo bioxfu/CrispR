@@ -6,7 +6,7 @@ library(gridExtra)
 argv <- commandArgs(T)
 txdb <- loadDb(argv[1])
 fasta <- argv[2]
-gRNAtable <- read.table(argv[3])
+gRNAtable <- read.table(argv[3], stringsAsFactors = F)
 output <- argv[4]
 
 plates <- gRNAtable$V1
