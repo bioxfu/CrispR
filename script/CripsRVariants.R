@@ -5,10 +5,15 @@ library(gridExtra)
 
 argv <- commandArgs(T)
 txdb <- loadDb(argv[1])
+fasta <- argv[2]
+gRNAtable <- read.table(argv[3])
+output <- argv[4]
 
-plates <- c('plate01')
-           
-gd_fnames <- c('guide/gRNA.bed')
+plates <- gRNAtable$V1
+gd_fnames <- gRNAtable$V2
+
+#plates <- c('plate01')
+#gd_fnames <- c('guide/gRNA.bed')
 
 indel_table <- NULL
 
@@ -30,7 +35,7 @@ for (N in 1:length(plates)) {
       sample_names <- sub('.bam', '', dir(paste0('bam/', plate), pattern = paste0(RP, '_[0-9]+.bam$')))
       bam_fnames <- bam_fnames[c(1,5:12,2:4)]
       sample_names <- sample_names[c(1,5:12,2:4)]
-      reference <- system(sprintf('samtools faidx ~/Gmatic7/genome/tair10/tair10.fa %s:%s-%s', seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
+      reference <- system(sprintf('samtools faidx %s %s:%s-%s', fasta, seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
       if (as.character(strand(gdl[i])) == '-') {
         reference <- Biostrings::reverseComplement(Biostrings::DNAString(reference))
       }
@@ -68,5 +73,5 @@ for (N in 1:length(plates)) {
   }
 }
 
-write.table(indel_table, './tables/indel_freq_all.tsv', row.names = F, quote=F, sep='\t')
+write.table(indel_table, output, row.names = F, quote=F, sep='\t')
 
