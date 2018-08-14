@@ -1,6 +1,9 @@
-#! /usr/bin/env python
+#! ~/miniconda2/bin/python
+
+## Note: This script only works in Python2
 
 from optparse import OptionParser
+from itertools import izip
 import gzip
 import os
 
@@ -34,15 +37,15 @@ sample2handle = {}
 for samples in barcode2sample.values():
 	sample2handle[samples] = [gzip.open(options.output+'/'+samples+'_R1.fastq.gz', 'wb'), gzip.open(options.output+'/'+samples+'_R2.fastq.gz', 'wb')]
 
-for lineA, lineB in zip(fileA, fileB):
+for lineA, lineB in izip(fileA, fileB):
 	lineA_1 = lineA.strip()
-	lineA_2 = next(fileA).strip()
-	lineA_3 = next(fileA).strip()
-	lineA_4 = next(fileA).strip()
+	lineA_2 = fileA.next().strip()
+	lineA_3 = fileA.next().strip()
+	lineA_4 = fileA.next().strip()
 	lineB_1 = lineB.strip()
-	lineB_2 = next(fileB).strip()
-	lineB_3 = next(fileB).strip()
-	lineB_4 = next(fileB).strip()
+	lineB_2 = fileB.next().strip()
+	lineB_3 = fileB.next().strip()
+	lineB_4 = fileB.next().strip()
 
 	FP = lineA_2[4:8]
 	RP = lineB_2[4:8]
