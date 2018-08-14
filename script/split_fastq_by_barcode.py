@@ -1,7 +1,10 @@
 #! /usr/bin/env python
 
 from optparse import OptionParser
-from itertools import izip
+try:
+    from itertools import izip as zip
+except ImportError: # will be 3.x series
+    pass
 import gzip
 import os
 
@@ -35,7 +38,7 @@ sample2handle = {}
 for samples in barcode2sample.values():
 	sample2handle[samples] = [gzip.open(options.output+'/'+samples+'_R1.fastq.gz', 'wb'), gzip.open(options.output+'/'+samples+'_R2.fastq.gz', 'wb')]
 
-for lineA, lineB in izip(fileA, fileB):
+for lineA, lineB in zip(fileA, fileB):
 	lineA_1 = lineA.strip()
 	lineA_2 = fileA.next().strip()
 	lineA_3 = fileA.next().strip()
