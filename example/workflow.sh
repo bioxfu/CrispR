@@ -4,6 +4,10 @@ GRNA=guide/gRNA_ath # without file extension name (.fa)
 PLATES=(5686)
 OUTPUT=tables/indel_freq_all_ath.tsv
 
+## Other config
+MYHOME=/cluster/home/xfu
+RVERSION=3.5.1
+
 ## Arabidopsis thaliana
 FASTA=$MYHOME/Gmatic7/genome/tair10/tair10.fa
 BOWTIE_INDEX=$MYHOME/Gmatic7/genome/tair10/bowtie/tair10
@@ -15,10 +19,6 @@ TXDB=$MYHOME/Gmatic7/gene/tair10/txdb/tair10_txdb.sqlite
 # BOWTIE_INDEX=$MYHOME/Gmatic7/genome/tomato/bowtie/Sly3
 # BWA_INDEX=$MYHOME/Gmatic7/genome/tomato/bwa/Sly3
 # TXDB=$MYHOME/Gmatic7/gene/tomato/txdb/Sly3_txdb.sqlite
-
-## Other config
-MYHOME=/cluster/home/xfu
-RVERSION=3.5.1
 
 ## Workflow
 echo 'Get barcode information from Excel file'
