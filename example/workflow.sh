@@ -37,12 +37,15 @@ for PLATE in ${PLATES[@]}; do
 done
 
 echo 'Map short reads'
-ls split/ |./script/rush -k 'mkdir -p bam/{}'
-find split/*|sed -n 's/_R[12].fastq.gz//p'|sort|uniq|./script/rush -k "bwa mem $BWA_INDEX {}_R1.fastq.gz {}_R2.fastq.gz | samtools view -Shb | samtools sort -o bam/{/%}/{%@split/(.+?)/}.bam"
-ls bam/*/*.bam|parallel --gnu 'samtools index {}'
+for PLATE in ${PLATES[@]}; do
+	echo $PLATE
+	mkdir -p bam/${PLATE}
+	find split/${PLATE}/*|sed -n 's/_R[12].fastq.gz//p'|sort|uniq|./script/rush -k "bwa mem $BWA_INDEX {}_R1.fastq.gz {}_R2.fastq.gz | samtools view -Shb | samtools sort -o bam/{/%}/{%@split/(.+?)/}.bam"
+	ls bam/${PLATE}/*.bam|parallel --gnu 'samtools index {}'
+done
 
 echo 'CripsRVariants'
-rm ${GRNA}.tsv
+rm -f ${GRNA}.tsv
 for PLATE in ${PLATES[@]}; do  echo -e "$PLATE\t${GRNA}_fix.bed" >> ${GRNA}.tsv; done
 $MYHOME/R/$RVERSION/bin/Rscript script/CripsRVariants.R $TXDB $FASTA ${GRNA}.tsv $OUTPUT
 
