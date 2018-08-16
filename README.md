@@ -75,5 +75,5 @@ cp example/workflow.sh workflow_sly.sh
 # To build the CrispVariants
 $MYHOME/R/$RVERSION/bin/R CMD build --no-build-vignettes CrispRVariants/
 # To INSTALL the CrispVariants
-$MYHOME/R/$RVERSION/bin/R CMD INSTALL CrispRVariants_1.8.0.tar.gz 
+$MYHOME/R/$RVERSION/bin/R CMD INSTALL -l $MYHOME/R/$RVERSION/lib64/R/library CrispRVariants_1.8.0.tar.gz 
 ```
