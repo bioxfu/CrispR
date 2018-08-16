@@ -2,7 +2,8 @@
 SHEET=sample_sheet # without file extension name (.xlsx)
 GRNA=guide/gRNA_ath # without file extension name (.fa)
 PLATES=(5686)
-OUTPUT=tables/indel_freq_all_ath.tsv
+OUTPUT_INDEL=tables/indel_freq_all_ath.tsv
+OUTPUT_SNV=tables/snv_freq_all_ath # without any file extension name
 
 ## Other config
 MYHOME=/cluster/home/xfu
@@ -47,7 +48,7 @@ done
 echo 'CripsRVariants'
 rm -f ${GRNA}.tsv
 for PLATE in ${PLATES[@]}; do  echo -e "$PLATE\t${GRNA}_fix.bed" >> ${GRNA}.tsv; done
-$MYHOME/R/$RVERSION/bin/Rscript script/CripsRVariants.R $TXDB $FASTA ${GRNA}.tsv $OUTPUT
+$MYHOME/R/$RVERSION/bin/Rscript script/CripsRVariants.R $TXDB $FASTA ${GRNA}.tsv $OUTPUT_INDEL $OUTPUT_SNV
 
 #echo 'Double check the indel frequency'
 #find bam/$PLATE/*.bam -printf "%f\n"|sed 's/.bam//'|parallel --gnu "bedtools bamtobed -i bam/$PLATE/{}.bam -cigar| bedtools intersect -a guide/gRNA.bed -b - -wa -wb |awk '{print \"$PLATE\t\"\$4\"\t{}\t\"\$13}' > {}.tmp"; cat *.tmp > tables/reads_from_gRNA_with_cigar; rm *.tmp

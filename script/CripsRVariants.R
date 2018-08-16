@@ -7,13 +7,17 @@ argv <- commandArgs(T)
 txdb <- loadDb(argv[1])
 fasta <- argv[2]
 gRNAtable <- read.table(argv[3], stringsAsFactors = F)
-output <- argv[4]
+output_indel <- argv[4]
+output_snv <- argv[5]
+
+# txdb <- loadDb('~/Gmatic7/gene/tair10/txdb/tair10_txdb.sqlite')
+# fasta <- '~/Gmatic7/genome/tair10/tair10.fa'
+# gRNAtable <- read.table('guide/gRNA_ath.tsv', stringsAsFactors = F)
+# output_indel <- 'test_indel.tsv'
+# output_snv <- 'test_snv'
 
 plates <- gRNAtable$V1
 gd_fnames <- gRNAtable$V2
-
-#plates <- c('plate01')
-#gd_fnames <- c('guide/gRNA.bed')
 
 indel_table <- NULL
 
@@ -28,6 +32,11 @@ for (N in 1:length(plates)) {
     gname <- mcols(gdl)$name[i]
     folder <- paste0('figures/', plate, '/', gname)
     system(paste0('mkdir -p ', folder))
+
+    snv_table <- as.data.frame(matrix(nrow = 4*29, ncol = 96))
+    colnames(snv_table) <- paste0(rep(LETTERS[1:8], each=12), '_', 1:12)
+    rownames(snv_table) <- paste0(rep(c(-23:-1, 1:6), each=4), c('A', 'T', 'C', 'G'))
+    
     for (RP in LETTERS[1:8]) {
       cat(paste0(plate, '_', gname, '_', RP, '...\n'))
       
@@ -65,13 +74,32 @@ for (N in 1:length(plates)) {
         indel_percent <- round(freqs_indel / freqs_all * 100, 2)
         sample_names <- names(freqs_all)
         indel_table <- rbind(indel_table, as.data.frame(cbind(plate, gname, sample_names, freqs_all, freqs_indel, indel_percent)))
+        
+        snv_freqs <- freqs[grep('SNV:', rownames(freqs)),]
+        lst <- strsplit(sub('SNV:', '', rownames(snv_freqs)), ',')
+        snv_freqs2 <- NULL
+        lst2 <- NULL
+        for (n in 1:length(lst)) {
+          for (m in 1:length(lst[[n]])) {
+            snv_freqs2 <- rbind(snv_freqs2, snv_freqs[n,])
+            lst2 <- c(lst2, lst[[n]][m]) 
+          }
+        }
+        snv_freqs3 <- aggregate(snv_freqs2, by=list(lst2), FUN=sum)
+        rownames(snv_freqs3) <- snv_freqs3[, 1]
+        snv_freqs3 <- snv_freqs3[, -1]
+        snv_freqs3 <- t(apply(snv_freqs3, 1, function(x){round(x/freqs_all*100,2)}))
+        snv_table[rownames(snv_freqs3), colnames(snv_freqs3)] <- snv_freqs3
       }
       else {
         indel_table <- rbind(indel_table, as.data.frame(cbind(plate, gname, sample_names, freqs_all=0, freqs_indel=0, indel_percent=0)))
       }
     }
+    
+    write.table(snv_table, paste0(output_snv, '_', plate, '_', gname, '.tsv'), col.names = NA, quote=F, sep='\t')
+    
   }
 }
 
-write.table(indel_table, output, row.names = F, quote=F, sep='\t')
+write.table(indel_table, output_indel, row.names = F, quote=F, sep='\t')
 

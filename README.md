@@ -68,3 +68,12 @@ cp example/workflow.sh workflow_sly.sh
 ./workflow_ath.sh
 ./workflow_sly.sh
 ```
+
+### Note
+```
+# I update the CrispVariants to call the SNVs which are 23nt upstream and 6nt downstream from the cut site. 
+# To build the CrispVariants
+$MYHOME/R/$RVERSION/bin/R CMD build --no-build-vignettes CrispRVariants/
+# To INSTALL the CrispVariants
+$MYHOME/R/$RVERSION/bin/R CMD INSTALL CrispRVariants_1.8.0.tar.gz 
+```
