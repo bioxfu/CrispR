@@ -9,12 +9,14 @@ fasta <- argv[2]
 gRNAtable <- read.table(argv[3], stringsAsFactors = F)
 output_indel <- argv[4]
 output_snv <- argv[5]
+output_aln <- argv[6]
 
 # txdb <- loadDb('~/Gmatic7/gene/tair10/txdb/tair10_txdb.sqlite')
 # fasta <- '~/Gmatic7/genome/tair10/tair10.fa'
 # gRNAtable <- read.table('guide/gRNA_ath.tsv', stringsAsFactors = F)
 # output_indel <- 'test_indel.tsv'
 # output_snv <- 'test_snv'
+# output_aln <- 'test_aln'
 
 plates <- gRNAtable$V1
 gd_fnames <- gRNAtable$V2
@@ -28,6 +30,12 @@ for (N in 1:length(plates)) {
   gd <- rtracklayer::import(gd_fname)
   gdl <- GenomicRanges::resize(gd, width(gd) + 10, fix = 'center')
   
+  tot <- read.table(paste0('split/', plate, '/reads_stat.tsv'))
+  rownames(tot) <- tot[, 1]
+  tot <- tot[, -1]
+  colnames(tot) <- c('barcode', 'total_reads')
+  tot <- tot[paste0(rep(LETTERS[1:8], each=12), '_', 1:12), ]
+
   for (i in 1:length(gdl)) {
     gname <- mcols(gdl)$name[i]
     folder <- paste0('figures/', plate, '/', gname)
@@ -37,6 +45,8 @@ for (N in 1:length(plates)) {
     colnames(snv_table) <- paste0(rep(LETTERS[1:8], each=12), '_', 1:12)
     rownames(snv_table) <- paste0(rep(c(-23:-1, 1:6), each=4), c('A', 'T', 'C', 'G'))
     
+    alns <- rep(0, 96)
+    names(alns) <- paste0(rep(LETTERS[1:8], each=12), '_', 1:12)
     for (RP in LETTERS[1:8]) {
       cat(paste0(plate, '_', gname, '_', RP, '...\n'))
       
@@ -70,11 +80,11 @@ for (N in 1:length(plates)) {
         if (length(indel) > 1) {
           freqs_indel <- colSums(freqs[indel,])
         }
-        
+
         indel_percent <- round(freqs_indel / freqs_all * 100, 2)
         sample_names <- names(freqs_all)
         indel_table <- rbind(indel_table, as.data.frame(cbind(plate, gname, sample_names, freqs_all, freqs_indel, indel_percent)))
-        
+
         snv_freqs <- freqs[grep('SNV:', rownames(freqs)),]
         lst <- strsplit(sub('SNV:', '', rownames(snv_freqs)), ',')
         snv_freqs2 <- NULL
@@ -82,7 +92,7 @@ for (N in 1:length(plates)) {
         for (n in 1:length(lst)) {
           for (m in 1:length(lst[[n]])) {
             snv_freqs2 <- rbind(snv_freqs2, snv_freqs[n,])
-            lst2 <- c(lst2, lst[[n]][m]) 
+            lst2 <- c(lst2, lst[[n]][m])
           }
         }
         snv_freqs3 <- aggregate(snv_freqs2, by=list(lst2), FUN=sum)
@@ -90,15 +100,21 @@ for (N in 1:length(plates)) {
         snv_freqs3 <- snv_freqs3[, -1]
         snv_freqs3 <- t(apply(snv_freqs3, 1, function(x){round(x/freqs_all*100,2)}))
         snv_table[rownames(snv_freqs3), colnames(snv_freqs3)] <- snv_freqs3
+        
+        runs <- sapply(crispr_set$crispr_runs, function(x){length(x$alns)})
+        alns[names(runs)] <- runs
       }
       else {
         indel_table <- rbind(indel_table, as.data.frame(cbind(plate, gname, sample_names, freqs_all=0, freqs_indel=0, indel_percent=0)))
       }
     }
-    
     write.table(snv_table, paste0(output_snv, '_', plate, '_', gname, '.tsv'), col.names = NA, quote=F, sep='\t')
     
+    alns <- data.frame(alns)
+    colnames(alns) <- gname
+    tot <- cbind(tot, alns)
   }
+  write.table(tot, paste0(output_aln, '_', plate, '.tsv'), col.names = NA, quote=F, sep='\t')
 }
 
 write.table(indel_table, output_indel, row.names = F, quote=F, sep='\t')
