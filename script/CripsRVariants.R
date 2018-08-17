@@ -41,7 +41,7 @@ for (N in 1:length(plates)) {
     folder <- paste0('figures/', plate, '/', gname)
     system(paste0('mkdir -p ', folder))
 
-    snv_table <- as.data.frame(matrix(nrow = 4*29, ncol = 96))
+    snv_table <- as.data.frame(matrix(0, nrow = 4*29, ncol = 96))
     colnames(snv_table) <- paste0(rep(LETTERS[1:8], each=12), '_', 1:12)
     rownames(snv_table) <- paste0(rep(c(-23:-1, 1:6), each=4), c('A', 'T', 'C', 'G'))
     
