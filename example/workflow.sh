@@ -27,15 +27,19 @@ echo 'Get barcode information from Excel file'
 $MYHOME/R/$RVERSION/bin/Rscript script/parse_barcode_in_excel.R
 
 echo 'Map gRNA sequence to genome to find its position'
-bowtie -f -v 0 -a $BOWTIE_INDEX ${GRNA}.fa |awk '{print $3"\t"$4"\t"$4+length($5)"\t"$1"\t0\t"$2}' > ${GRNA}.bed
-## sometimes the length of given gRNA is not 23nt, we need to fix the bed file
-grep '+$' ${GRNA}.bed|awk 'BEGIN { OFS = "\t" } {$2=$3-23; print $0}' > ${GRNA}_fix.bed
-grep '\-$' ${GRNA}.bed|awk 'BEGIN { OFS = "\t" } {$3=$2+23; print $0}' >> ${GRNA}_fix.bed
+if [ ! -f ${GRNA}_fix.bed ]; then
+	bowtie -f -v 0 -a $BOWTIE_INDEX ${GRNA}.fa |awk '{print $3"\t"$4"\t"$4+length($5)"\t"$1"\t0\t"$2}' > ${GRNA}.bed
+	## sometimes the length of given gRNA is not 23nt, we need to fix the bed file
+	grep '+$' ${GRNA}.bed|awk 'BEGIN { OFS = "\t" } {$2=$3-23; print $0}' > ${GRNA}_fix.bed
+	grep '\-$' ${GRNA}.bed|awk 'BEGIN { OFS = "\t" } {$3=$2+23; print $0}' >> ${GRNA}_fix.bed
+fi
 
 echo 'Split reads according to the barcode'
 for PLATE in ${PLATES[@]}; do
 	echo $PLATE
-	$MYHOME/miniconda2/bin/python script/split_fastq_by_barcode.py -f fastq/${PLATE}_R1.fastq.gz -r fastq/${PLATE}_R2.fastq.gz -b tables/${SHEET}.barcode_sequence.tsv -o split/$PLATE
+	if [ ! -f split/$PLATE/reads_stat.tsv ]; then
+		$MYHOME/miniconda2/bin/python script/split_fastq_by_barcode.py -f fastq/${PLATE}_R1.fastq.gz -r fastq/${PLATE}_R2.fastq.gz -b tables/${SHEET}.barcode_sequence.tsv -o split/$PLATE
+	fi
 done
 
 echo 'Map short reads'
