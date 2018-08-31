@@ -85,21 +85,28 @@ for (N in 1:length(plates)) {
         sample_names <- names(freqs_all)
         indel_table <- rbind(indel_table, as.data.frame(cbind(plate, gname, sample_names, freqs_all, freqs_indel, indel_percent)))
 
-        snv_freqs <- freqs[grep('SNV:', rownames(freqs)),]
-        lst <- strsplit(sub('SNV:', '', rownames(snv_freqs)), ',')
-        snv_freqs2 <- NULL
-        lst2 <- NULL
-        for (n in 1:length(lst)) {
-          for (m in 1:length(lst[[n]])) {
-            snv_freqs2 <- rbind(snv_freqs2, snv_freqs[n,])
-            lst2 <- c(lst2, lst[[n]][m])
+        snv <- grep('SNV:', rownames(freqs))
+        if (length(snv) > 0) {
+          snv_freqs <- freqs[snv,,drop=F]
+          lst <- strsplit(sub('SNV:', '', rownames(snv_freqs)), ',')
+          snv_freqs2 <- NULL
+          lst2 <- NULL
+          for (n in 1:length(lst)) {
+            for (m in 1:length(lst[[n]])) {
+              snv_freqs2 <- rbind(snv_freqs2, snv_freqs[n,,drop=F])
+              lst2 <- c(lst2, lst[[n]][m])
+            }
           }
+          snv_freqs3 <- aggregate(snv_freqs2, by=list(lst2), FUN=sum)
+          rownames(snv_freqs3) <- snv_freqs3[, 1]
+          snv_freqs3 <- snv_freqs3[, -1, drop=F]
+          if (ncol(snv_freqs3) == 1) {
+            snv_freqs3 <- round(snv_freqs3/freqs_all*100,2)
+          } else {
+            snv_freqs3 <- t(apply(snv_freqs3, 1, function(x){round(x/freqs_all*100,2)}))
+          }
+          snv_table[rownames(snv_freqs3), colnames(snv_freqs3)] <- snv_freqs3
         }
-        snv_freqs3 <- aggregate(snv_freqs2, by=list(lst2), FUN=sum)
-        rownames(snv_freqs3) <- snv_freqs3[, 1]
-        snv_freqs3 <- snv_freqs3[, -1]
-        snv_freqs3 <- t(apply(snv_freqs3, 1, function(x){round(x/freqs_all*100,2)}))
-        snv_table[rownames(snv_freqs3), colnames(snv_freqs3)] <- snv_freqs3
         
         runs <- sapply(crispr_set$crispr_runs, function(x){length(x$alns)})
         alns[names(runs)] <- runs
