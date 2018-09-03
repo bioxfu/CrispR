@@ -65,8 +65,8 @@ cp example/workflow.sh workflow_sly.sh
 ### 8. Run *workflow.sh*
 ```
 # Don't run it on head node
-./workflow_ath.sh
-./workflow_sly.sh
+nohup ./workflow_ath.sh &
+nohup ./workflow_sly.sh &
 ```
 
 ### Note
