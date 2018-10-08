@@ -25,7 +25,7 @@ TXDB=$MYHOME/Gmatic7/gene/tair10/txdb/tair10_txdb.sqlite
 ## Morus notabilis
 # FASTA=$MYHOME/Gmatic7/genome/morus/index/morus_notabilis.fa
 # BOWTIE_INDEX=$MYHOME/Gmatic7/genome/morus/index/morus_notabilis
-# BWA_INDEX=$MYHOME/Gmatic7/genome/morus/index/morus_notabilis
+# BWA_INDEX=$MYHOME/Gmatic7/genome/morus/index/morus_notabilis.fa
 # TXDB=$MYHOME/Gmatic7/genome/morus/txdb/morus_notabilis_txdb.sqlite
 
 ## Workflow
