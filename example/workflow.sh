@@ -22,6 +22,12 @@ TXDB=$MYHOME/Gmatic7/gene/tair10/txdb/tair10_txdb.sqlite
 # BWA_INDEX=$MYHOME/Gmatic7/genome/tomato/bwa/Sly3
 # TXDB=$MYHOME/Gmatic7/gene/tomato/txdb/Sly3_txdb.sqlite
 
+## Morus notabilis
+# FASTA=$MYHOME/Gmatic7/genome/morus/index/morus_notabilis.fa
+# BOWTIE_INDEX=$MYHOME/Gmatic7/genome/morus/index/morus_notabilis
+# BWA_INDEX=$MYHOME/Gmatic7/genome/morus/index/morus_notabilis
+# TXDB=$MYHOME/Gmatic7/genome/morus/txdb/morus_notabilis_txdb.sqlite
+
 ## Workflow
 echo 'Get barcode information from Excel file'
 $MYHOME/R/$RVERSION/bin/Rscript script/parse_barcode_in_excel.R
@@ -38,7 +44,7 @@ echo 'Split reads according to the barcode'
 for PLATE in ${PLATES[@]}; do
 	echo $PLATE
 	if [ ! -f split/$PLATE/reads_stat.tsv ]; then
-		$MYHOME/miniconda2/bin/python script/split_fastq_by_barcode.py -f fastq/${PLATE}_R1.fastq.gz -r fastq/${PLATE}_R2.fastq.gz -b tables/${SHEET}.barcode_sequence.tsv -o split/$PLATE
+	    $MYHOME/miniconda2/bin/python script/split_fastq_by_barcode.py -f fastq/${PLATE}_R1.fastq.gz -r fastq/${PLATE}_R2.fastq.gz -b tables/${SHEET}.barcode_sequence.tsv -o split/$PLATE
 	fi
 done
 

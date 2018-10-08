@@ -59,6 +59,9 @@ cp example/workflow.sh workflow_ath.sh
 ## Solanum lycopersicum
 cp example/workflow.sh workflow_sly.sh
 
+## Morus notabilis
+cp example/workflow.sh workflow_mno.sh
+
 ## edit workflow.sh
 ```
 
