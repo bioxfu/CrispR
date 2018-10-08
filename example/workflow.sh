@@ -41,12 +41,7 @@ if [ ! -f ${GRNA}_fix.bed ]; then
 fi
 
 echo 'Split reads according to the barcode'
-for PLATE in ${PLATES[@]}; do
-	echo $PLATE
-	if [ ! -f split/$PLATE/reads_stat.tsv ]; then
-	    $MYHOME/miniconda2/bin/python script/split_fastq_by_barcode.py -f fastq/${PLATE}_R1.fastq.gz -r fastq/${PLATE}_R2.fastq.gz -b tables/${SHEET}.barcode_sequence.tsv -o split/$PLATE
-	fi
-done
+for PLATE in ${PLATES[@]}; do if [ ! -f split/$PLATE/reads_stat.tsv ]; then  echo $PLATE; fi; done|parallel --gnu "$MYHOME/miniconda2/bin/python script/split_fastq_by_barcode.py -f fastq/{}_R1.fastq.gz -r fastq/{}_R2.fastq.gz -b tables/${SHEET}.barcode_sequence.tsv -o split/{}"
 
 echo 'Map short reads'
 for PLATE in ${PLATES[@]}; do
@@ -64,3 +59,4 @@ $MYHOME/R/$RVERSION/bin/Rscript script/CripsRVariants.R $TXDB $FASTA ${GRNA}.tsv
 #echo 'Double check the indel frequency'
 #find bam/$PLATE/*.bam -printf "%f\n"|sed 's/.bam//'|parallel --gnu "bedtools bamtobed -i bam/$PLATE/{}.bam -cigar| bedtools intersect -a guide/gRNA.bed -b - -wa -wb |awk '{print \"$PLATE\t\"\$4\"\t{}\t\"\$13}' > {}.tmp"; cat *.tmp > tables/reads_from_gRNA_with_cigar; rm *.tmp
 #$MYHOME/R/$RVERSION/bin/Rscript script/indel_from_cigar.R
+
