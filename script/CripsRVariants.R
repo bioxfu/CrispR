@@ -37,7 +37,6 @@ for (N in 1:length(plates)) {
   tot <- tot[, -1]
   colnames(tot) <- c('barcode', 'total_reads')
   tot <- tot[paste0(rep(LETTERS[1:8], each=12), '_', 1:12), ]
-  #tot <- tot[!is.na(tot$barcode), ]
 
   for (i in 1:length(gdl)) {
     gname <- mcols(gdl)$name[i]
@@ -57,8 +56,8 @@ for (N in 1:length(plates)) {
       sample_names <- sub('.bam', '', dir(paste0('bam/', plate), pattern = paste0(RP, '_[0-9]+.bam$')))
       bam_fnames <- bam_fnames[c(1,5:12,2:4)]
       sample_names <- sample_names[c(1,5:12,2:4)]
-      reference <- system(sprintf('/home/xfu/miniconda2/envs/gmatic/bin/samtools faidx %s %s:%s-%s', fasta, seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
-      #reference <- system(sprintf('samtools faidx %s %s:%s-%s', fasta, seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
+      #reference <- system(sprintf('/home/xfu/miniconda2/envs/gmatic/bin/samtools faidx %s %s:%s-%s', fasta, seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
+      reference <- system(sprintf('samtools faidx %s %s:%s-%s', fasta, seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
       if (as.character(strand(gdl[i])) == '-') {
         reference <- Biostrings::reverseComplement(Biostrings::DNAString(reference))
       }
@@ -99,7 +98,7 @@ for (N in 1:length(plates)) {
           freqs_indel <- freqs[indel,]
         }
         if (length(indel) > 1) {
-          freqs_indel <- colSums(freqs[indel,])
+          freqs_indel <- colSums(freqs[indel,,drop=F])
         }
 
         indel_percent <- round(freqs_indel / freqs_all * 100, 2)
