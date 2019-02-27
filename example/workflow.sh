@@ -5,6 +5,7 @@ PLATES=(5686)
 OUTPUT_INDEL=tables/indel_freq_all_ath.tsv
 OUTPUT_SNV=tables/snv_freq_all_ath # without any file extension name
 OUTPUT_ALN=tables/aln_freq_all_ath # without any file extension name
+PAM=Cpf1 # [Cas9, Cpf1]
 
 ## Other config
 MYHOME=/cluster/home/xfu
@@ -35,9 +36,21 @@ $MYHOME/R/$RVERSION/bin/Rscript script/parse_barcode_in_excel.R
 echo 'Map gRNA sequence to genome to find its position'
 if [ ! -f ${GRNA}_fix.bed ]; then
 	bowtie -f -v 0 -a $BOWTIE_INDEX ${GRNA}.fa |awk '{print $3"\t"$4"\t"$4+length($5)"\t"$1"\t0\t"$2}' > ${GRNA}.bed
-	## sometimes the length of given gRNA is not 23nt, we need to fix the bed file
-	grep '+$' ${GRNA}.bed|awk 'BEGIN { OFS = "\t" } {$2=$3-23; print $0}' > ${GRNA}_fix.bed
-	grep '\-$' ${GRNA}.bed|awk 'BEGIN { OFS = "\t" } {$3=$2+23; print $0}' >> ${GRNA}_fix.bed
+	
+	if [ $PAM == "Cas9" ]; then
+	  ## Cas9：5'-(N)20 NGG-3'
+	  ## sometimes the length of given gRNA is not 23nt, we need to fix the bed file
+	  grep '+$' ${GRNA}.bed|awk 'BEGIN { OFS = "\t" } {$2=$3-23; print $0}' > ${GRNA}_fix.bed
+	  grep '\-$' ${GRNA}.bed|awk 'BEGIN { OFS = "\t" } {$3=$2+23; print $0}' >> ${GRNA}_fix.bed
+	fi
+
+	if [ $PAM == "Cpf1" ]; then
+	  ## Cpf1:5'-NTTN(N)23-3'
+	  ## sometimes the length of given gRNA is not 27nt, we need to fix the bed file
+	  grep '+$' ${GRNA}.bed|awk 'BEGIN { OFS = "\t" } {$3=$2+27; print $0}' > ${GRNA}_fix.bed
+	  grep '\-$' ${GRNA}.bed|awk 'BEGIN { OFS = "\t" } {$2=$3-27; print $0}' >> ${GRNA}_fix.bed
+	fi
+
 fi
 
 echo 'Split reads according to the barcode'
@@ -54,7 +67,7 @@ done
 echo 'CripsRVariants'
 rm -f ${GRNA}.tsv
 for PLATE in ${PLATES[@]}; do  echo -e "$PLATE\t${GRNA}_fix.bed" >> ${GRNA}.tsv; done
-$MYHOME/R/$RVERSION/bin/Rscript script/CripsRVariants.R $TXDB $FASTA ${GRNA}.tsv $OUTPUT_INDEL $OUTPUT_SNV $OUTPUT_ALN
+$MYHOME/R/$RVERSION/bin/Rscript script/CripsRVariants.R $TXDB $FASTA ${GRNA}.tsv $OUTPUT_INDEL $OUTPUT_SNV $OUTPUT_ALN $PAM
 
 #echo 'Double check the indel frequency'
 #find bam/$PLATE/*.bam -printf "%f\n"|sed 's/.bam//'|parallel --gnu "bedtools bamtobed -i bam/$PLATE/{}.bam -cigar| bedtools intersect -a guide/gRNA.bed -b - -wa -wb |awk '{print \"$PLATE\t\"\$4\"\t{}\t\"\$13}' > {}.tmp"; cat *.tmp > tables/reads_from_gRNA_with_cigar; rm *.tmp

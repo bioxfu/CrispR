@@ -10,13 +10,15 @@ gRNAtable <- read.table(argv[3], stringsAsFactors = F)
 output_indel <- argv[4]
 output_snv <- argv[5]
 output_aln <- argv[6]
+pam <- argv[7]
 
 # txdb <- loadDb('~/Gmatic7/gene/tair10/txdb/tair10_txdb.sqlite')
 # fasta <- '~/Gmatic7/genome/tair10/tair10.fa'
-# gRNAtable <- read.table('guide/gRNA_ath.tsv', stringsAsFactors = F)
+# gRNAtable <- read.table('guide/gRNA.tsv', stringsAsFactors = F)
 # output_indel <- 'test_indel.tsv'
 # output_snv <- 'test_snv'
 # output_aln <- 'test_aln'
+# pam <- 'Cpf1'
 
 plates <- gRNAtable$V1
 gd_fnames <- gRNAtable$V2
@@ -35,6 +37,7 @@ for (N in 1:length(plates)) {
   tot <- tot[, -1]
   colnames(tot) <- c('barcode', 'total_reads')
   tot <- tot[paste0(rep(LETTERS[1:8], each=12), '_', 1:12), ]
+  #tot <- tot[!is.na(tot$barcode), ]
 
   for (i in 1:length(gdl)) {
     gname <- mcols(gdl)$name[i]
@@ -54,18 +57,36 @@ for (N in 1:length(plates)) {
       sample_names <- sub('.bam', '', dir(paste0('bam/', plate), pattern = paste0(RP, '_[0-9]+.bam$')))
       bam_fnames <- bam_fnames[c(1,5:12,2:4)]
       sample_names <- sample_names[c(1,5:12,2:4)]
-      reference <- system(sprintf('samtools faidx %s %s:%s-%s', fasta, seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
+      reference <- system(sprintf('/home/xfu/miniconda2/envs/gmatic/bin/samtools faidx %s %s:%s-%s', fasta, seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
+      #reference <- system(sprintf('samtools faidx %s %s:%s-%s', fasta, seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
       if (as.character(strand(gdl[i])) == '-') {
         reference <- Biostrings::reverseComplement(Biostrings::DNAString(reference))
       }
-      crispr_set <- readsToTarget(bam_fnames, target = gdl[i], reference = reference, names = sample_names, target.loc = 22, chimeras='ignore', verbose=FALSE)
+      if (pam == 'Cas9') {
+        # target.loc = 5 + 17
+        crispr_set <- readsToTarget(bam_fnames, target = gdl[i], reference = reference, names = sample_names, target.loc = 22, chimeras='ignore', verbose=FALSE)
+      }
+      if (pam == 'Cpf1') {
+        # target.loc = 5 + (4 + 19)
+        crispr_set <- readsToTarget(bam_fnames, target = gdl[i], reference = reference, names = sample_names, target.loc = 28, chimeras='ignore', verbose=FALSE)
+      }
+      
       if (!is.null(crispr_set)) {
         pdf(paste0(folder, '/', plate, '_', gname, '_', RP, '.pdf'), wid=15, hei=15)
-        p <- plotVariants(crispr_set, txdb=txdb, gene.text.size=8,
-                          row.ht.ratio=c(1,8), col.wdth.ratio=c(4,2),
-                          plotAlignments.args = list(line.weight=0.5, ins.size=2, legend.symbol.size=4),
-                          plotFreqHeatmap.args = list(plot.text.size=3, x.size=8, legend.text.size=8,
-                                                      legend.key.height=grid::unit(0.5, "lines")))
+        if (pam == 'Cas9') {
+          p <- plotVariants(crispr_set, txdb=txdb, gene.text.size=8,
+                            row.ht.ratio=c(1,8), col.wdth.ratio=c(4,2),
+                            plotAlignments.args = list(line.weight=0.5, ins.size=2, legend.symbol.size=4),
+                            plotFreqHeatmap.args = list(plot.text.size=3, x.size=8, legend.text.size=8,
+                                                        legend.key.height=grid::unit(0.5, "lines")))
+        }
+        if (pam == 'Cpf1') {
+          p <- plotVariants(crispr_set, txdb=txdb, gene.text.size=8,
+                            row.ht.ratio=c(1,8), col.wdth.ratio=c(4,2),
+                            plotAlignments.args = list(line.weight=0.5, ins.size=2, legend.symbol.size=4, guide.loc=IRanges(6, 32), pam.start=6, pam.end=9),
+                            plotFreqHeatmap.args = list(plot.text.size=3, x.size=8, legend.text.size=8,
+                                                        legend.key.height=grid::unit(0.5, "lines")))
+        }
         dev.off()
 
         freqs <- crispr_set$cigar_freqs
