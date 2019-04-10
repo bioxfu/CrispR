@@ -9,14 +9,16 @@ fasta <- argv[2]
 gRNAtable <- read.table(argv[3], stringsAsFactors = F)
 output_indel <- argv[4]
 output_snv <- argv[5]
-output_aln <- argv[6]
-pam <- argv[7]
+output_DI <- argv[6]
+output_aln <- argv[7]
+pam <- argv[8]
 
 # txdb <- loadDb('~/Gmatic7/gene/tair10/txdb/tair10_txdb.sqlite')
 # fasta <- '~/Gmatic7/genome/tair10/tair10.fa'
 # gRNAtable <- read.table('guide/gRNA.tsv', stringsAsFactors = F)
 # output_indel <- 'test_indel.tsv'
 # output_snv <- 'test_snv'
+# output_DI <- 'test_DI'
 # output_aln <- 'test_aln'
 # pam <- 'Cpf1'
 
@@ -46,6 +48,7 @@ for (N in 1:length(plates)) {
     snv_table <- as.data.frame(matrix(0, nrow = 4*29, ncol = 96))
     colnames(snv_table) <- paste0(rep(LETTERS[1:8], each=12), '_', 1:12)
     rownames(snv_table) <- paste0(rep(c(-23:-1, 1:6), each=4), c('A', 'T', 'C', 'G'))
+    DI_table <- NULL
     
     alns <- rep(0, 96)
     names(alns) <- paste0(rep(LETTERS[1:8], each=12), '_', 1:12)
@@ -56,8 +59,8 @@ for (N in 1:length(plates)) {
       sample_names <- sub('.bam', '', dir(paste0('bam/', plate), pattern = paste0(RP, '_[0-9]+.bam$')))
       bam_fnames <- bam_fnames[c(1,5:12,2:4)]
       sample_names <- sample_names[c(1,5:12,2:4)]
-      #reference <- system(sprintf('/home/xfu/miniconda2/envs/gmatic/bin/samtools faidx %s %s:%s-%s', fasta, seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
-      reference <- system(sprintf('samtools faidx %s %s:%s-%s', fasta, seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
+      reference <- system(sprintf('/home/xfu/miniconda2/envs/gmatic/bin/samtools faidx %s %s:%s-%s', fasta, seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
+      #reference <- system(sprintf('samtools faidx %s %s:%s-%s', fasta, seqnames(gdl)[i], start(gdl)[i], end(gdl)[i]), intern = TRUE)[[2]]
       if (as.character(strand(gdl[i])) == '-') {
         reference <- Biostrings::reverseComplement(Biostrings::DNAString(reference))
       }
@@ -128,6 +131,19 @@ for (N in 1:length(plates)) {
           snv_table[rownames(snv_freqs3), colnames(snv_freqs3)] <- snv_freqs3
         }
         
+        DI <- sort(grep('[DI]', rownames(freqs), value = T))
+        if (length(DI) > 0){
+          DI_freqs <- freqs[DI,,drop=F]
+          colnames(DI_freqs) <- sub('._', 'X_', colnames(DI_freqs))
+          DI_freqs_all <- data.frame(matrix(nrow=nrow(DI_freqs), ncol=12, data = 0))
+          colnames(DI_freqs_all) <- paste0('X_', 1:12)
+          DI_freqs_all$RP <- RP
+          DI_freqs_all$INDEL <- rownames(DI_freqs)
+          DI_freqs_all[, colnames(DI_freqs)] <- DI_freqs
+          DI_freqs_all <- DI_freqs_all[, c('RP', 'INDEL', paste0('X_', 1:12))]
+          DI_table <- rbind(DI_table, DI_freqs_all)
+        }
+
         runs <- sapply(crispr_set$crispr_runs, function(x){length(x$alns)})
         alns[names(runs)] <- runs
       }
@@ -136,6 +152,7 @@ for (N in 1:length(plates)) {
       }
     }
     write.table(snv_table, paste0(output_snv, '_', plate, '_', gname, '.tsv'), col.names = NA, quote=F, sep='\t')
+    write.table(DI_table, paste0(output_DI, '_', plate, '_', gname, '.tsv'), row.names = F, quote=F, sep='\t')
     
     alns <- data.frame(alns)
     colnames(alns) <- gname
