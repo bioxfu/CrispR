@@ -4,6 +4,7 @@ GRNA=guide/gRNA_ath # without file extension name (.fa)
 PLATES=(5686)
 OUTPUT_INDEL=tables/indel_freq_all_ath.tsv
 OUTPUT_SNV=tables/snv_freq_all_ath # without any file extension name
+OUTPUT_DI=tables/DI_freq_all_ath # without any file extension name
 OUTPUT_ALN=tables/aln_freq_all_ath # without any file extension name
 PAM=Cpf1 # [Cas9, Cpf1]
 
@@ -67,7 +68,7 @@ done
 echo 'CripsRVariants'
 rm -f ${GRNA}.tsv
 for PLATE in ${PLATES[@]}; do  echo -e "$PLATE\t${GRNA}_fix.bed" >> ${GRNA}.tsv; done
-$MYHOME/R/$RVERSION/bin/Rscript script/CripsRVariants.R $TXDB $FASTA ${GRNA}.tsv $OUTPUT_INDEL $OUTPUT_SNV $OUTPUT_ALN $PAM
+$MYHOME/R/$RVERSION/bin/Rscript script/CripsRVariants.R $TXDB $FASTA ${GRNA}.tsv $OUTPUT_INDEL $OUTPUT_SNV $OUTPUT_DI $OUTPUT_ALN $PAM
 
 #echo 'Double check the indel frequency'
 #find bam/$PLATE/*.bam -printf "%f\n"|sed 's/.bam//'|parallel --gnu "bedtools bamtobed -i bam/$PLATE/{}.bam -cigar| bedtools intersect -a guide/gRNA.bed -b - -wa -wb |awk '{print \"$PLATE\t\"\$4\"\t{}\t\"\$13}' > {}.tmp"; cat *.tmp > tables/reads_from_gRNA_with_cigar; rm *.tmp
