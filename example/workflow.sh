@@ -74,3 +74,13 @@ $MYHOME/R/$RVERSION/bin/Rscript script/CripsRVariants.R $TXDB $FASTA ${GRNA}.tsv
 #find bam/$PLATE/*.bam -printf "%f\n"|sed 's/.bam//'|parallel --gnu "bedtools bamtobed -i bam/$PLATE/{}.bam -cigar| bedtools intersect -a guide/gRNA.bed -b - -wa -wb |awk '{print \"$PLATE\t\"\$4\"\t{}\t\"\$13}' > {}.tmp"; cat *.tmp > tables/reads_from_gRNA_with_cigar; rm *.tmp
 #$MYHOME/R/$RVERSION/bin/Rscript script/indel_from_cigar.R
 
+#echo 'Map short reads to gRNA library construct'
+#for PLATE in ${PLATES[@]}; do
+#	echo $PLATE
+#	mkdir -p bam/${PLATE}
+#	find split/${PLATE}/*|sed -n 's/_R[12].fastq.gz//p'|sort|uniq|./script/rush -k "bowtie2 -x guide/gRNA_construct.fa -U {}_R2.fastq.gz | samtools view -Shb | samtools sort -o bam/{/%}/{%@split/(.+?)/}.bam"
+#	ls bam/${PLATE}/*.bam|parallel --gnu 'samtools index {}'
+#	ls bam/${PLATE}/*.bam|parallel --gnu 'samtools idxstats {}|grep -v "*" > {}.stats'
+#done
+#$MYHOME/R/$RVERSION/bin/Rscript script/gRNA_counts.R
+
