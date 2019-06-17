@@ -20,7 +20,7 @@ pam <- argv[8]
 # output_snv <- 'test_snv'
 # output_DI <- 'test_DI'
 # output_aln <- 'test_aln'
-# pam <- 'Cpf1'
+# pam <- 'Cas9'
 
 plates <- gRNAtable$V1
 gd_fnames <- gRNAtable$V2
@@ -34,12 +34,14 @@ for (N in 1:length(plates)) {
   gd <- rtracklayer::import(gd_fname)
   gdl <- GenomicRanges::resize(gd, width(gd) + 10, fix = 'center')
   
-  tot <- read.table(paste0('split/', plate, '/reads_stat.tsv'))
-  rownames(tot) <- tot[, 1]
-  tot <- tot[, -1]
+  tot <- data.frame(matrix(nrow=96, ncol=2))
+  rownames(tot) <- paste0(rep(LETTERS[1:8], each=12), '_', 1:12)
+  tot2 <- read.table(paste0('split/', plate, '/reads_stat.tsv'), row.names = 1)
+  tot <- merge(tot, tot2, by.x=0, by.y=0, all.x=T)
+  rownames(tot) <- tot[,1]
+  tot <- tot[paste0(rep(LETTERS[1:8], each=12), '_', 1:12), c(4,5)]
   colnames(tot) <- c('barcode', 'total_reads')
-  tot <- tot[paste0(rep(LETTERS[1:8], each=12), '_', 1:12), ]
-
+  
   for (i in 1:length(gdl)) {
     gname <- mcols(gdl)$name[i]
     folder <- paste0('figures/', plate, '/', gname)
@@ -48,7 +50,7 @@ for (N in 1:length(plates)) {
     snv_table <- as.data.frame(matrix(0, nrow = 4*29, ncol = 96))
     colnames(snv_table) <- paste0(rep(LETTERS[1:8], each=12), '_', 1:12)
     rownames(snv_table) <- paste0(rep(c(-23:-1, 1:6), each=4), c('A', 'T', 'C', 'G'))
-    DI_table <- NULL
+    DI_table <- data.frame(NULL)
     
     alns <- rep(0, 96)
     names(alns) <- paste0(rep(LETTERS[1:8], each=12), '_', 1:12)
@@ -141,7 +143,11 @@ for (N in 1:length(plates)) {
           DI_freqs_all$INDEL <- rownames(DI_freqs)
           DI_freqs_all[, colnames(DI_freqs)] <- DI_freqs
           DI_freqs_all <- DI_freqs_all[, c('RP', 'INDEL', paste0('X_', 1:12))]
-          DI_table <- rbind(DI_table, DI_freqs_all)
+          if (nrow(DI_table) == 0){
+            DI_table <- DI_freqs_all
+          } else {
+            DI_table <- rbind(as.matrix(DI_table), as.matrix(DI_freqs_all))
+          }
         }
 
         runs <- sapply(crispr_set$crispr_runs, function(x){length(x$alns)})
