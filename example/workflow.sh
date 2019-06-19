@@ -77,10 +77,10 @@ $MYHOME/R/$RVERSION/bin/Rscript script/CripsRVariants.R $TXDB $FASTA ${GRNA}.tsv
 #echo 'Map short reads to gRNA library construct'
 #for PLATE in ${PLATES[@]}; do
 #	echo $PLATE
-#	mkdir -p bam/${PLATE}
-#	find split/${PLATE}/*|sed -n 's/_R[12].fastq.gz//p'|sort|uniq|./script/rush -k "bowtie2 -x guide/gRNA_construct.fa -U {}_R2.fastq.gz | samtools view -Shb | samtools sort -o bam/{/%}/{%@split/(.+?)/}.bam"
-#	ls bam/${PLATE}/*.bam|parallel --gnu 'samtools index {}'
-#	ls bam/${PLATE}/*.bam|parallel --gnu 'samtools idxstats {}|grep -v "*" > {}.stats'
+#	mkdir -p bam2/${PLATE}
+#	find split/${PLATE}/*|sed -n 's/_R[12].fastq.gz//p'|sort|uniq|./script/rush -k "bowtie2 -x guide/gRNA_construct.fa -U {}_R2.fastq.gz | samtools view -Shb | samtools sort -o bam2/{/%}/{%@split/(.+?)/}.bam"
+#	ls bam2/${PLATE}/*.bam|parallel --gnu 'samtools index {}'
+#	ls bam2/${PLATE}/*.bam|parallel --gnu 'samtools idxstats {}|grep -v "*" > {}.stats'
 #done
 #$MYHOME/R/$RVERSION/bin/Rscript script/gRNA_counts.R
 

@@ -1,5 +1,5 @@
-files <- dir('bam', pattern = '*.stats', recursive = TRUE, full.names = TRUE)
-sampleID <- sub('.bam.stats', '', dir('bam', pattern = '*.stats', recursive = TRUE))
+files <- dir('bam2', pattern = '*.stats', recursive = TRUE, full.names = TRUE)
+sampleID <- sub('.bam.stats', '', dir('bam2', pattern = '*.stats', recursive = TRUE))
 
 counts <- NULL
 
