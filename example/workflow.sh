@@ -6,7 +6,7 @@ OUTPUT_INDEL=tables/indel_freq_all_ath.tsv
 OUTPUT_SNV=tables/snv_freq_all_ath # without any file extension name
 OUTPUT_DI=tables/DI_freq_all_ath # without any file extension name
 OUTPUT_ALN=tables/aln_freq_all_ath # without any file extension name
-PAM=Cpf1 # [Cas9, Cpf1]
+PAM=Cas9 # [Cas9, Cpf1]
 
 ## Other config
 MYHOME=/cluster/home/xfu
@@ -29,6 +29,12 @@ TXDB=$MYHOME/Gmatic7/gene/tair10/txdb/tair10_txdb.sqlite
 # BOWTIE_INDEX=$MYHOME/Gmatic7/genome/morus/index/morus_notabilis
 # BWA_INDEX=$MYHOME/Gmatic7/genome/morus/index/morus_notabilis.fa
 # TXDB=$MYHOME/Gmatic7/genome/morus/txdb/morus_notabilis_txdb.sqlite
+
+## Human
+# FASTA=$MYHOME/Gmatic7/genome/human/GRCh38.fa
+# BOWTIE_INDEX=$MYHOME/Gmatic7/genome/human/bowtie/GRCh38
+# BWA_INDEX=$MYHOME/Gmatic7/genome/human/bwa/GRCh38
+# TXDB=$MYHOME/Gmatic7/gene/human/txdb/GRCh38_v29_txdb.sqlite
 
 ## Workflow
 echo 'Get barcode information from Excel file'
