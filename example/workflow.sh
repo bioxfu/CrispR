@@ -90,3 +90,11 @@ $MYHOME/R/$RVERSION/bin/Rscript script/CripsRVariants.R $TXDB $FASTA ${GRNA}.tsv
 #done
 #$MYHOME/R/$RVERSION/bin/Rscript script/gRNA_counts.R
 
+#### single sample
+#### don't have to split the fastq
+# mkdir bam
+# bwa mem -t 30 $BWA_INDEX fastq/${PLATE}_R1.fastq.gz fastq/${PLATE}_R2.fastq.gz | samtools view -Shb | samtools sort -o bam/${PLATE}.bam
+# echo 'CripsRVariants'
+# rm -f ${GRNA}.tsv
+# for PLATE in ${PLATES[@]}; do  echo -e "$PLATE\t${GRNA}_fix.bed" >> ${GRNA}.tsv; done
+# $MYHOME/R/$RVERSION/bin/Rscript script/CripsRVariants_single_sample.R $TXDB $FASTA ${GRNA}.tsv $OUTPUT_INDEL $OUTPUT_SNV $OUTPUT_DI $PAM
