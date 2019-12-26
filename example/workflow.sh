@@ -18,6 +18,12 @@ BOWTIE_INDEX=$MYHOME/Gmatic7/genome/tair10/bowtie/tair10
 BWA_INDEX=$MYHOME/Gmatic7/genome/tair10/bwa/tair10
 TXDB=$MYHOME/Gmatic7/gene/tair10/txdb/tair10_txdb.sqlite
 
+## Oryza sativa Nipponbare (Rice)
+#FASTA=$MYHOME/Gmatic7/genome/rice/Osativa_Nipponbare.fa
+#BOWTIE_INDEX=$MYHOME/Gmatic7/genome/rice/bowtie/Osativa_Nipponbare
+#BWA_INDEX=$MYHOME/Gmatic7/genome/rice/bwa/Osativa_Nipponbare
+#TXDB=$MYHOME/Gmatic7/gene/rice/txdb/Osativa_Nipponbare_txdb.sqlite
+
 ## Solanum lycopersicum
 # FASTA=$MYHOME/Gmatic7/genome/tomato/Sly3.fa
 # BOWTIE_INDEX=$MYHOME/Gmatic7/genome/tomato/bowtie/Sly3
